@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "minio-tfstate"
+spec:
+  selector:
+    matchLabels:
+      app: "minio-tfstate"
+  serviceName: "minio-tfstate-service"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "minio-tfstate"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: minio
+        image: "quay.io/minio/minio"
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "3bab4acc-646d-416a-b7f9-8e1208708b96"
+        args:
+        - server
+        - /data
+        - '--console-address'
+        - ":9001"
+        volumeMounts:
+        - name: datastore
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 256Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "minio-tfstate-service"
+spec:
+  selector:
+    app: "minio-tfstate"
+  type: "LoadBalancer"
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: api
+    protocol: TCP
+    port: 9000
+    targetPort: 9000
+  - name: console
+    protocol: TCP
+    port: 9001
+    targetPort: 9001
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: minio-tfstate-api
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: minio-tfstate-service
+#             port:
+#               number: 9000
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: minio-tfstate-console
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: minio-tfstate-service
+#             port:
+#               number: 9001
+

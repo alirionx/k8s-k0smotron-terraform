@@ -1,0 +1,10 @@
+apiVersion: k0smotron.io/v1beta1
+kind: JoinTokenRequest
+metadata:
+  name: ${service_id}-token
+  namespace: ${service_namespace}
+spec:
+  clusterRef:
+    name: ${service_id}
+    namespace: ${service_namespace}
+  # expiry: 1d

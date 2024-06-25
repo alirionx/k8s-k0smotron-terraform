@@ -1,0 +1,29 @@
+apiVersion: k0smotron.io/v1beta1
+kind: Cluster
+metadata:
+  name: ${service_id}
+  namespace: ${service_namespace}
+spec:
+  replicas: ${control_plane_replicas}
+  image: k0sproject/k0s
+  version: ${k0s_version}
+  service:
+    type: ${service_endpoint_type}
+    apiPort: 6443
+    konnectivityPort: 8132
+  persistence:
+    # type: emptyDir
+    type: pvc
+    persistentVolumeClaim:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        # name: k0s-cluster-pvc # Must be disabled! K0smotron creates an own name
+      spec:
+        storageClassName: block-silver
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: ${datastore_size}Gi
