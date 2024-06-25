@@ -2,7 +2,7 @@ variable "kube_api_url" {
   type = string
 }
 
-variable "kube_token" {
+variable "kube_config_path" {
   type = string
 }
 

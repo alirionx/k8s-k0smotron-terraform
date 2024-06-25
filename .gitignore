@@ -5,3 +5,4 @@
 *.hcl
 *.lock.info
 backend.tf
+kube-config.yaml
