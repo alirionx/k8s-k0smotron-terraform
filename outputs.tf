@@ -40,15 +40,19 @@ data "kubernetes_resource" "k0s_cluster_join_kubeconfig" {
   }
 }
 
-output "access_info" {
+output "endpoint_info" {
   value = jsonencode(
     {
       external_ip = data.kubernetes_resource.k0s_cluster_service_lb.object.status.loadBalancer.ingress[0].ip
       internal_ip = data.kubernetes_resource.k0s_cluster_service_lb.object.spec.clusterIP
       k8s_api_port = data.kubernetes_resource.k0s_cluster_service_lb.object.spec.ports[0].port
       k8s_konnectivity_port = data.kubernetes_resource.k0s_cluster_service_lb.object.spec.ports[1].port
-      cluster_join_token = base64decode(data.kubernetes_resource.k0s_cluster_join_token_secret.object.data.token)
-      kubeconfig = base64decode(data.kubernetes_resource.k0s_cluster_join_kubeconfig.object.data.value)
     }
   )
+}
+output "cluster_join_token" {
+  value = base64decode(data.kubernetes_resource.k0s_cluster_join_token_secret.object.data.token)
+}
+output "cluster_kube_config" {
+  value = base64decode(data.kubernetes_resource.k0s_cluster_join_kubeconfig.object.data.value)
 }
