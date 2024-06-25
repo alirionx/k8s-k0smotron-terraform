@@ -15,8 +15,8 @@ data "kubernetes_resource" "k0s_cluster_service_lb" {
   api_version = "v1"
   kind        = "Service"
   metadata {
-    name      = "kmc-k0smotron-palim-lb"
-    namespace = "default"
+    name      = "kmc-${var.service_id}-lb"
+    namespace = var.service_namespace
   }
 }
 
@@ -25,8 +25,8 @@ data "kubernetes_resource" "k0s_cluster_join_token_secret" {
   api_version = "v1"
   kind        = "Secret"
   metadata {
-    name      = "k0smotron-palim-token"
-    namespace = "default"
+    name      = "${var.service_id}-token"
+    namespace = var.service_namespace
   }
 }
 
@@ -35,12 +35,12 @@ data "kubernetes_resource" "k0s_cluster_join_kubeconfig" {
   api_version = "v1"
   kind        = "Secret"
   metadata {
-    name      = "k0smotron-palim-kubeconfig"
-    namespace = "default"
+    name      = "${var.service_id}-kubeconfig"
+    namespace = var.service_namespace
   }
 }
 
-output "test" {
+output "access_info" {
   value = {
     external_ip = data.kubernetes_resource.k0s_cluster_service_lb.object.status.loadBalancer.ingress[0].ip
     internal_ip = data.kubernetes_resource.k0s_cluster_service_lb.object.spec.clusterIP
